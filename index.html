@@ -66,19 +66,29 @@
 </footer>
 
 <script>
-const sheetURL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRduR0jJ9xLlPDSgJ87WF4jzRYmd5z1uoCwB6K8jXBzWjYhyqVrncRzX5CjnZDf9C72h7ezCtVjosR5/pub?output=csv";
-
 const sheetTabs = ["Fuel", "Forex", "MoMo", "Food"];
 const container = document.getElementById('container');
 
-// Function to load each sheet as CSV
+// Update with your actual GIDs
+const gidMap = {
+  "Fuel": "0",
+  "Forex": "664194768",
+  "MoMo": "1279967204",
+  "Food": "2136509006"
+};
+
+
+function getGID(tab) {
+  return gidMap[tab] || "0";
+}
+
 function loadSheet(tabName) {
   const url = `https://docs.google.com/spreadsheets/d/e/2PACX-1vRduR0jJ9xLlPDSgJ87WF4jzRYmd5z1uoCwB6K8jXBzWjYhyqVrncRzX5CjnZDf9C72h7ezCtVjosR5/pub?gid=${getGID(tabName)}&single=true&output=csv`;
 
   fetch(url)
     .then(res => res.text())
     .then(data => {
-      const rows = data.trim().split("\n").map(r => r.split(","));
+      const rows = data.trim().split("\n").map(row => row.split(","));
       const headers = rows[0];
       const entries = rows.slice(1);
 
@@ -100,9 +110,9 @@ function loadSheet(tabName) {
       const tbody = document.createElement("tbody");
 
       const headRow = document.createElement("tr");
-      headers.forEach(h => {
+      headers.forEach(header => {
         const th = document.createElement("th");
-        th.textContent = h;
+        th.textContent = header;
         headRow.appendChild(th);
       });
       thead.appendChild(headRow);
@@ -120,27 +130,16 @@ function loadSheet(tabName) {
       table.appendChild(thead);
       table.appendChild(tbody);
       content.appendChild(table);
-
       card.appendChild(title);
       card.appendChild(content);
       container.appendChild(card);
+    })
+    .catch(error => {
+      console.error("Error loading sheet:", error);
     });
 }
 
-// GIDs of your sheet tabs (you can adjust these)
-const gidMap = {
-  "Fuel": "0",
-  "Forex": "664194768",
-  "MoMo": "1279967204",
-  "Food": "2136509006"
-};
-
-
-function getGID(tab) {
-  return gidMap[tab] || "0";
-}
-
-// Load all tabs
+// Load all categories
 sheetTabs.forEach(loadSheet);
 </script>
 
